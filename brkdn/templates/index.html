@@ -1,0 +1,128 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        #chart-container {
+            width: 100%;
+            height: 600px;
+        }
+        .controls {
+            margin: 20px;
+            text-align: center;
+        }
+        input, button, select {
+            padding: 8px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <input type="text" id="symbol" placeholder="Enter stock symbol (e.g., AAPL)" value="AAPL">
+        <select id="exchange">
+            <option value="NYSE">NYSE/NQ</option>
+            <option value="NSE">NSE</option>
+            <option value="LSE">LSE</option>
+        </select>
+        <button onclick="fetchData()">Fetch Data</button>
+    </div>
+    <div id="chart-container"></div>
+
+    <script>
+        let chart = echarts.init(document.getElementById('chart-container'));
+        let intervalId;
+
+        function fetchData() {
+            const symbol = document.getElementById('symbol').value;
+            const exchange = document.getElementById('exchange').value;
+            
+            fetch(`/fetch_ohlc/${symbol}/${exchange}`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        updateChart(result.data);
+                    } else {
+                        console.error('Error fetching data:', result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function updateChart(data) {
+            const option = {
+                title: {
+                    text: 'Stock Price Chart',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: data.map(item => item[0]),
+                    scale: true
+                },
+                yAxis: {
+                    type: 'value',
+                    scale: true
+                },
+                series: [{
+                    type: 'candlestick',
+                    data: data.map(item => [
+                        item[1], // Open
+                        item[2], // Close
+                        item[3], // Low
+                        item[4]  // High
+                    ]),
+                    itemStyle: {
+                        color: '#00da3c', // Green for up candles
+                        color0: '#ec0000', // Red for down candles
+                        borderColor: '#008F28', // Border color for up candles
+                        borderColor0: '#8A0000' // Border color for down candles
+                    }
+                }],
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        start: 0,
+                        end: 100
+                    },
+                    {
+                        show: true,
+                        type: 'slider',
+                        top: '90%',
+                        start: 0,
+                        end: 100
+                    }
+                ]
+            };
+            
+            chart.setOption(option, {notMerge: true}); // Retain chart state
+        }
+
+        // Initial load
+        fetchData();
+
+        // Periodically fetch new data every second
+        intervalId = setInterval(fetchData, 1000);
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            chart.resize();
+        });
+
+        // Stop fetching data when the window is closed
+        window.addEventListener('beforeunload', function() {
+            clearInterval(intervalId);
+        });
+    </script>
+</body>
+</html>
