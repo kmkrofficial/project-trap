@@ -51,6 +51,48 @@ def get_fundamental_stock_data(stock_name):
     
     return financial_info
 
+def get_operating_cash_flow_data(stock_name):
+    parsed = make_request(f"/quote/{stock_name}/cash-flow/")
+    if parsed == None:
+        return {
+            "status" : "failure",
+            "data" : "Unable to retrieve"
+        }
+    
+    cash_flow_table = parsed.find("div", {"class" : "table yf-1pgoo1f"})
+    theaders = cash_flow_table.find("div", {"class" : "tableHeader yf-1pgoo1f"})
+    tbody = cash_flow_table.find("div", {"class" : "tableBody yf-1pgoo1f"})
+
+    cash_flow_headers = []
+
+    for item in theaders.select(".column.yf-1ezv2n5:not(.sticky)"):
+        cash_flow_headers.append(item.find(string=True).strip())
+
+    cash_flow_data = {}
+
+    for item in tbody.select(".row.lv-0.yf-1xjz32c"):
+        main_key_name = item.select(".sticky")[0].text.strip()
+        sub_headers = []
+        sub_values = []
+        i = 0
+        # print(item.select(".column.yf-1ezv2n5:not(.sticky)"))
+        for subitem in item.select(".column:not(.sticky)"):
+            print(subitem)
+            value = subitem.find(string=True).strip()
+            if (value != "--"):
+                sub_headers.append(cash_flow_headers[i])
+                sub_values.append(value)
+            i+=1
+        if (len(sub_headers) > 0):
+            cash_flow_data[main_key_name] = {
+                "dates" : sub_headers,
+                "values" : sub_values
+            }
+
+    return cash_flow_data
+
+# print(get_operating_cash_flow_data("DJT"))
+
 # print(get_fundamental_stock_data("DJT"))
 
 # print(get_ohlc_data("DJT"))
