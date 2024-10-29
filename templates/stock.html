@@ -1,7 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 	<h1>
-		Hello World
+		Stock Name
 	</h1>
-	{{ olhc_data }}
-	{{ fundamental_data }}
+    {% for i in olhc_data %}
 {% endblock %}
