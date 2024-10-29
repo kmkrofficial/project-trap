@@ -1,13 +1,66 @@
 {% extends 'base.html' %} {% block content %}
-	<h1>
-		Hello World
-	</h1>
-	<h1>OLHC</h1>
-	{{ ohlc_data }}
-	<h1>Funda</h1>
-	{{ fundamental_data }}
-	<h1>
-		Cash flow
-	</h1>
-	{{ cash_flow_info }}
+<h1>Hello World</h1>
+<h1>OLHC</h1>
+{% if ohlc_data.status != "failure" %}
+<table class="table">
+	<thead class="table-light">
+		<th>Info</th>
+		<th>Value</th>
+	</thead>
+	<tbody>
+		{% for key in ohlc_data.data.keys() %}
+		<tr>
+			<td>
+				<strong>{{ key }}</strong>
+			</td>
+			<td>{{ ohlc_data.data[key][0] }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endif %}
+<h1>Funda</h1>
+<table class="table">
+	<thead class="table-light">
+		<th>Info</th>
+		<th>Value</th>
+	</thead>
+	<tbody>
+		{% for key in fundamental_data.keys() %}
+		<tr>
+			<td>
+				<strong>{{ key }}</strong>
+			</td>
+			<td>{{ fundamental_data[key] }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<h1>Cash flow</h1>
+{% for data in cash_flow_info %}
+<div id="{{data.title}}" style="height: 400px; width: 1000px"></div>
+{% endfor %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script>
+	var cash_flow_info = {{ cash_flow_info | tojson }};
+	for (var i=0; i<cash_flow_info.length; i++) {
+		var item = cash_flow_info[i]
+		  var myChart = echarts.init(document.getElementById(item.title));
+		  var option = {
+			  title: {
+				  text: item.title
+			  },
+			  tooltip: {},
+			  xAxis: {
+				  data: item.dates
+			  },
+			  yAxis: {},
+			  series: [{
+				  type: "bar",
+				  data: item.values
+			  }]
+		  };
+		  myChart.setOption(option);
+	}
+</script>
 {% endblock %}

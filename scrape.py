@@ -68,7 +68,7 @@ def get_operating_cash_flow_data(stock_name):
     for item in theaders.select(".column.yf-1ezv2n5:not(.sticky)"):
         cash_flow_headers.append(item.find(string=True).strip())
 
-    cash_flow_data = {}
+    cash_flow_data = []
 
     for item in tbody.select(".row.lv-0.yf-1xjz32c"):
         main_key_name = item.select(".sticky")[0].text.strip()
@@ -77,17 +77,17 @@ def get_operating_cash_flow_data(stock_name):
         i = 0
         # print(item.select(".column.yf-1ezv2n5:not(.sticky)"))
         for subitem in item.select(".column:not(.sticky)"):
-            print(subitem)
             value = subitem.find(string=True).strip()
             if (value != "--"):
                 sub_headers.append(cash_flow_headers[i])
-                sub_values.append(value)
+                sub_values.append(value.replace(",", ""))
             i+=1
         if (len(sub_headers) > 0):
-            cash_flow_data[main_key_name] = {
+            cash_flow_data.append({
                 "dates" : sub_headers,
-                "values" : sub_values
-            }
+                "values" : sub_values,
+                "title" : main_key_name
+            })
 
     return cash_flow_data
 
