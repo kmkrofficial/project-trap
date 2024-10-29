@@ -39,10 +39,20 @@ def fetch_ohlc(symbol, exchange):
         # Check if data is available
         if df.empty:
             logging.warning(f"No data available for symbol {symbol} from {start_date} to {end_date}")
-            return jsonify({
-                'status': 'error',
-                'message': 'No data available for the selected time range'
-            })
+            
+            # Fetch last 60 bars from the previous close
+            previous_close_date = end_date - timedelta(days=1)
+            df = ticker.history(start=previous_close_date, end=end_date, interval='1m')
+            
+            # Check if data is available after fetching from previous close
+            if df.empty:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'No data available for the selected time range'
+                })
+            
+            # Limit to last 60 bars
+            df = df.tail(60)
         
         # Format data for ECharts
         data = []
