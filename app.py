@@ -12,10 +12,10 @@ def stock():
             "data": "Invalid API"
         })
     generic_info = {
-        "stock_name": request.args.get("stock_name"),
-        "stock_symbol": request.args.get("stock_symbol"),
-        "logo": request.args.get("logo"),
-        "sector": request.args.get("sector"),
+        "Stock Name": request.args.get("stock_name"),
+        "Stock Symbol": request.args.get("stock_symbol"),
+        "Logo": request.args.get("logo"),
+        "Sector": request.args.get("sector"),
     }
     stock_name = request.args.get("stock_symbol")
     ohlc_data = get_ohlc_data(stock_name)

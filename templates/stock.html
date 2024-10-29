@@ -1,6 +1,8 @@
-{% extends 'base.html' %} {% block content %}
-<h1>{{ generic_info.stock_name }}</h1>
-<table class="table">
+{% extends 'base.html' %} {% block content %} {% if generic_info['Logo'] %}
+<img src="{{ generic_info['Logo'] }}" />
+{% endif %}
+<h1>{{ generic_info['Stock Name'] }} - Stock Information</h1>
+<table class="table" style="padding-top: 15px;">
 	<thead class="table-light">
 		<th>Info</th>
 		<th>Value</th>
@@ -16,7 +18,7 @@
 		{% endfor %}
 	</tbody>
 </table>
-<h1>OLHC</h1>
+<h3 style="padding-top: 15px;">Today's Info</h3>
 {% if ohlc_data.status != "failure" %}
 <table class="table">
 	<thead class="table-light">
@@ -35,7 +37,7 @@
 	</tbody>
 </table>
 {% endif %}
-<h1>Funda</h1>
+<h3 style="padding-top: 10px;">Stock Fundamental Details</h3>
 <table class="table">
 	<thead class="table-light">
 		<th>Info</th>
@@ -52,10 +54,12 @@
 		{% endfor %}
 	</tbody>
 </table>
-<h1>Cash flow</h1>
-{% for data in cash_flow_info %}
-<div id="{{data.title}}" style="height: 400px; width: 1000px"></div>
-{% endfor %}
+<h3>Company Cash Flow</h3>
+<div>
+	{% for data in cash_flow_info %}
+	<div id="{{data.title}}" style="height: 500px; width: 1000px; text-align: center; padding-top: 10px;"></div>
+	{% endfor %}
+</div>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script>
 	var cash_flow_info = {{ cash_flow_info | tojson }};

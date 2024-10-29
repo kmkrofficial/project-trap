@@ -1,23 +1,45 @@
 {% extends 'base.html' %} {% block content %}
-	<h1>
-		Stock Name
-	</h1>
-	<form action="/" method="post">
-		<div class="mb-3">
-			<label for="searchBar" class="form-label">Search your Stock</label>
-			<input type="text" class="form-control" id="search stock" name="searchStock" placeholder="ICICI Bank" required>
+<style>
+	a {
+		color: inherit;
+	}
+</style>
+<h1>Project Trap</h1>
+<form action="/" method="post">
+	<div class="mb-3">
+		<label for="searchBar" class="form-label">Search your Stock</label>
+		<input
+			type="text"
+			class="form-control"
+			id="search stock"
+			name="searchStock"
+			placeholder="ICICI Bank"
+			required
+		/>
+	</div>
+	<button type="submit" class="btn btn-success">Search</button>
+	
+	<div style="margin-top: 10px;">
+		<h3>
+			Search Results
+		</h3>
+	</div>
+
+	{% if search_results %} {% for item in search_results %}
+	<div class="card" style="margin-top: 20px;">
+		<div class="card-body">
+			<img src='{{ item["logoUrl"]}}' />
+			<h3>{{ item['shortname'] }}</h3>
+			<div>{{ item['symbol'] }}</div>
+			<a
+				href="/stock?stock_symbol={{item['symbol']}}&stock_name={{item['shortname']}}&logo_url={{item['logoUrl']}}&sector={{item['sector']}}"
+			>
+				<button type="button" class="btn btn-info">
+					Look into this stock
+				</button>
+			</a>
 		</div>
-		<button type="submit" class="btn btn-primary">Search</button>
-		{% if search_results %}
-			{% for item in search_results %}
-				<a href="/stock?stock_symbol={{item['symbol']}}&stock_name={{item['shortname']}}&logo_url={{item['logoUrl']}}&sector={{item['sector']}}">
-					<div>
-						<img src='{{ item["logoUrl"]}}' />
-						<h3>{{ item['shortname'] }}</h3>
-						<h5>{{ item['symbol'] }}</h5>
-					</div>
-				</a>
-			{% endfor %}
-		{% endif %}
-	</form>
+	</div>
+	{% endfor %} {% endif %}
+</form>
 {% endblock %}
